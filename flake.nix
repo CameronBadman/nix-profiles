@@ -12,11 +12,9 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           
-          # Fetch and cache each profile flake
+          # Process each profile flake (already provided as input)
           cachedFlakes = map (profile: {
-            inherit (profile) name alias icon;
-            registry = profile.registry;
-            flake = builtins.getFlake profile.registry;
+            inherit (profile) name alias icon flake;
           }) profiles;
           
           # Create a simple derivation that references all flakes to ensure caching
@@ -24,7 +22,7 @@
             mkdir -p $out
             echo "Profiles cached successfully:" > $out/result.txt
             ${pkgs.lib.concatMapStringsSep "\n" (p: ''
-              echo "  ${p.name} (${p.alias}) ${p.icon} - ${p.registry}" >> $out/result.txt
+              echo "  ${p.name} (${p.alias}) ${p.icon}" >> $out/result.txt
             '') cachedFlakes}
           '';
           

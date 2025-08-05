@@ -3,12 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs }:
     let
-      # Utility function to install profiles (system-agnostic)
+      # Utility function to install profiles
       installProfiles = system: profiles: 
         let
           pkgs = nixpkgs.legacyPackages.${system};
@@ -34,19 +33,10 @@
         result = installer;
       };
       
-    in
-    {
+    in {
       # Export lib at top level
       lib = {
         inherit installProfiles;
       };
-    } //
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-        
-      in {
-        # Just provide packages for the per-system structure
-        packages = {};
-      });
+    };
 }
